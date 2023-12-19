@@ -1,0 +1,22 @@
+@import "~normalize.css/normalize.css";
+@import "./transition.css";
+html,
+body,
+#app {
+  height: 100vh;
+}
+* {
+  box-sizing: border-box;
+}
+
+.el-button--primary{
+  --el-button-background-color: var(--el-color-primary) !important;
+  --el-button-border-color: var(--el-color-primary) !important;
+  --el-button-hover-color: var(--el-color-primary-light-2) !important;
+  --el-button-active-background-color: var(--el-color-primary) !important;
+  --el-button-active-border-color: var(--el-color-primary) !important;
+}
+
+.el-checkbox{
+  height: 30px !important;
+}
