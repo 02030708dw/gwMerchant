@@ -14,7 +14,7 @@ import http from "@/api/http";
 import { registerComponents } from "./components";
 import * as Icons from "@element-plus/icons";
 import pinia from "./store/pinia";
-import '../mock/index'
+// import '../mock/index'
 import "./setting";
 
 const app = createApp(App);

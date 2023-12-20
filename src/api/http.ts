@@ -12,9 +12,9 @@ export interface HttpOption {
 }
 
 export interface Response<T = any> {
-  code: number
-  msg: string
-  data: T
+  resCode: string
+  resDesc: string
+  resultSet: T
 }
 
 function http<T = any>({
@@ -26,14 +26,21 @@ function http<T = any>({
   afterRequest,
 }: HttpOption) {
   const successHandler = (res: AxiosResponse<Response<T>>) => {
-    if (res.data.code === 200) {
+    if (res.data.resCode === '000000') {
       return res.data
     }
-    throw new Error(res.data.msg || '请求失败，未知异常')
+    else if (res.data.resCode==='000104'){
+      window.alert('登录失效,请重新登录')
+      // store.commit('user/LOGOUT')
+      // clearStorage()
+      window.location.reload()
+      // return undefined
+    }
+    throw new Error(res.data.resDesc || '请求失败，未知异常')
   }
   const failHandler = (error: Response<Error>) => {
     afterRequest && afterRequest()
-    throw new Error(error.msg || '请求失败，未知异常')
+    throw new Error(error.resDesc || '请求失败，未知异常')
   }
   beforeRequest && beforeRequest()
   method = method || 'GET'

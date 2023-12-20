@@ -5,14 +5,12 @@ import "nprogress/nprogress.css";
 import router, { asyncRoutes, constantRoutes } from "../router";
 import Cookies from "js-cookie";
 import { post } from "@/api/http";
-import { getMenuListByRoleId } from "@/api/url";
 import { RouteRecordRaw } from "vue-router";
 import { toHump } from ".";
 import { RouteRecordRawWithHidden } from "@/layouts/types";
 import useUserStore from "@/store/modules/user";
 import pinia from "@/store/pinia";
-import {adminRoutes} from "../../mock/router";
-
+import {adminRoutes} from "@/router/routes";
 const userStore = useUserStore(pinia);
 
 NProgress.configure({

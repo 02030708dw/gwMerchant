@@ -1,10 +1,10 @@
 {
-  "name": "admin-work-x",
+  "name": "merchantService",
   "version": "2.3.1",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "dev": "npm run serve",
-    "build": "vue-cli-service build",
+    "dev": "cross-env NODE_ENV=development npm run serve",
+    "build": "cross-env NODE_ENV=production vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -14,6 +14,7 @@
     "core-js": "^3.6.5",
     "cropperjs": "^1.5.12",
     "dayjs": "^1.11.5",
+    "dotenv": "^16.3.1",
     "echarts": "^5.0.2",
     "element-plus": "^2.2.18",
     "js-cookie": "^2.2.1",
@@ -56,6 +57,7 @@
     "@vue/eslint-config-typescript": "^7.0.0",
     "babel-eslint": "^10.1.0",
     "compression-webpack-plugin": "^5.0.1",
+    "cross-env": "^7.0.3",
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.0.0",

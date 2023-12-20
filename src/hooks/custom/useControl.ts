@@ -18,7 +18,7 @@ export function use_Control<T=FormItem>(updateRef:Ref,form:T[]){
     }
     const onResetPass = (it:any) => {
         ElMessageBox.confirm(
-           `确定要重置${it.nickName}用户吗？`,
+            `确定要重置${it.nickName}用户吗？`,
             "重置密码"
         )
             .then(() => {

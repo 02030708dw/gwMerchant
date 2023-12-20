@@ -73,7 +73,7 @@ export default defineComponent({
     const withPageInfoData = (otherParams = {}) => {
       return {
         ...otherParams,
-        page: pageModel.currentPage,
+        pageNo: pageModel.currentPage,
         pageSize: pageModel.pageSize,
       };
     };

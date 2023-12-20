@@ -6,4 +6,8 @@ export interface UserState {
   userName: string;
   nickName: string;
   avatar: string;
+  accessToken:string
+  tokenPrefix:string
+  initPassword:boolean
+  tokenHeader:string
 }

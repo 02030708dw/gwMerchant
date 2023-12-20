@@ -10,6 +10,8 @@ import {
   USER_INFO_KEY,
   USER_TOKEN_KEY,
 } from "../keys";
+import {setStorage} from "@/utils/storage";
+import {get} from "@/api/http";
 
 const defaultAvatar = Avatar;
 
@@ -48,7 +50,8 @@ const useUserStore = defineStore("user", {
         this.userName = userInfo.userName;
         this.nickName = userInfo.nickName;
         this.avatar = userInfo.avatar || defaultAvatar;
-        Cookies.set(USER_TOKEN_KEY, userInfo.token);
+        Cookies.set(USER_TOKEN_KEY, userInfo.tokenPrefix+userInfo.accessToken);
+        setStorage('token',userInfo.tokenPrefix+userInfo.accessToken)
         localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
         res();
       });
@@ -57,7 +60,8 @@ const useUserStore = defineStore("user", {
       this.nickName = newNickName;
     },
     logout() {
-      return new Promise<void>((res) => {
+      return new Promise<void>(async (res) => {
+        // await get({url:'/logout'})
         this.userId = 0;
         this.avatar = "";
         this.roleId = 0;

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {useLikeSearch} from "@/hooks";
 import {reactive,ref} from "vue";
-import type {propsModal} from './popupProps'
 import {DialogType} from "@/components/types";
+import {propsSearchModal} from "./popupProps";
 const {getSearchParams,likeSearchModel} = useLikeSearch();
-const props=withDefaults(defineProps<propsModal>(),{
+const props=withDefaults(defineProps<propsSearchModal>(),{
   title:'标题',
   formConfig:()=>({
     labelWidth: 100,

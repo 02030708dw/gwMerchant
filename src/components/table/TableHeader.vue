@@ -18,6 +18,7 @@
           >
             <el-button
               type="primary"
+              link
               plain
               @click="collapsed"
             >
@@ -46,7 +47,7 @@
             v-for="(row, i) of filterSearchModel"
             :key="i"
             :gutter="20"
-            :class="{ 'margin-top': i !== 0 }"
+            :class="{ 'margin-top-none': i !== 0 }"
             class="search-content-wrapper"
           >
             <el-col
@@ -81,7 +82,7 @@
                   v-model="item.value"
                   :placeholder="item.placeholder || '请选择条目'"
                   :filterable="item.filterable ? true : false"
-                  clearable
+                  :clearable="item.clearable===undefined"
                   class="form-item"
                   @change="
                     item.onChange
@@ -91,9 +92,9 @@
                 >
                   <el-option
                     v-for="optionItem in item.selectOptions"
-                    :key="optionItem.value"
-                    :value="optionItem.value"
-                    :label="optionItem.label"
+                    :key="item.selectConfig!==undefined?optionItem[item.selectConfig.valueField]:optionItem.value"
+                    :value="item.selectConfig!==undefined?optionItem[item.selectConfig.valueField]:optionItem.value"
+                    :label="item.selectConfig!==undefined?optionItem[item.selectConfig.labelField]:optionItem.label"
                   />
                 </el-select>
               </div>
@@ -153,6 +154,7 @@
               </div>
               <div
                 v-else-if="item.type === 'action'"
+                style="align-items: center;height: 100%"
                 class="flex justify-end"
               >
                 <el-button

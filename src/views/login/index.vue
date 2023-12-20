@@ -8,7 +8,7 @@
         <div class="desc">Vue3 + Webpack + Typescript + Element Plus</div>
         <div class="ttiipp">博观而约取 厚积而薄发</div>
         <div class="bottom">
-          {{ projectName + "    " + version }} · Made by qingqingxuan
+          {{ projectName + "    " + version }} · Made by 123123
         </div>
       </div>
     </div>
@@ -80,25 +80,24 @@ export default defineComponent({
   setup() {
     const projectName = setting.projectName;
     const version = setting.version;
-    const username = ref("admin");
+    const username = ref("测试用户名");
     const password = ref("123456");
     const autoLogin = ref(true);
     const loading = ref(false);
     const router = useRouter();
     const route = useRoute();
     const userStore = useUserStore();
-
     const onLogin = () => {
       loading.value = true;
       post({
         url: login,
         data: {
-          username: username.value,
+          account: username.value,
           password: password.value,
         },
       })
-        .then(({ data }: Response) => {
-          userStore.saveUser(data as UserState).then(() => {
+        .then((data: Response) => {
+          userStore.saveUser(data.resultSet).then(() => {
             router
               .replace({
                 path: route.query.redirect

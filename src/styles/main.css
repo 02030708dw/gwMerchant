@@ -911,7 +911,9 @@ body .el-table__fixed::before {
 .margin-top {
   margin-top: 15px;
 }
-
+.margin-top-none {
+  margin-top: 0
+}
 .margin-top-lg {
   margin-top: 20px;
 }

@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, reactive, ref } from "vue";
+import {defineComponent, onMounted, PropType, reactive, ref} from "vue";
 import draggable from "vuedraggable";
 import { Setting as SettingIcon } from "@element-plus/icons";
 export default defineComponent({
@@ -56,6 +56,12 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    onMounted(()=>{
+        document.body.ondrop = function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+        };
+    })
     const tempTableProps = props.tableProps as Array<TablePropsType>;
     const innerTableProps = ref(
       tempTableProps.map((it: TablePropsType) => {

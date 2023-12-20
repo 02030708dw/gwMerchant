@@ -28,3 +28,9 @@ export const getDefaultList = "/getDefaultList";
 export const getCardList = "/getCardList";
 
 export const getCommentList = "/getCommentList";
+
+// custom
+export const getMerchantAdminList = "/merchantAdmin/merchantAdminList";
+export const getGameList = "/merchantGame/merchantGameList";
+export const getGamePlayList = "/merchantGame/merchantGamePlayList";
+

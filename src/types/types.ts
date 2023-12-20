@@ -36,6 +36,7 @@ interface TableSearchItem {
   associatedOption?: string;
   onChange?: (value: any, associationItem: string) => void;
   span?: number;
+  selectConfig?:Record<'labelField'|'valueField', string>
 }
 
 interface FormItem extends TableSearchItem {

@@ -21,7 +21,7 @@ export const primaryColors = [
   "#008792",
 ];
 
-const projectName = "世彩";
+const projectName = "商户后台管理";
 const version = packageInfo.version;
 
 const defaultSetting = JSON.parse(localStorage.getItem("sys_setting") || "{}");

@@ -9,7 +9,7 @@
           "
             :search-model="likeSearchModel.conditionItems"
             :default-collapsed-state="true"
-            title="管理员列表"
+            title="游戏列表"
             @doSearch="doSearch"
             @resetSearch="resetSearch as any"
         />
@@ -18,16 +18,17 @@
         <TableConfig
             v-model:border="tableConfig.border"
             v-model:stripe="tableConfig.stripe"
+            v-model:tableColumns="tableProps"
             @refresh="doRefresh"
         >
-          <template #actions>
+<!--          <template #actions>
             <el-button type="success" size="small" icon="PlusIcon"
             >添加管理员
             </el-button>
             <el-button type="danger" size="small" icon="DeleteIcon" @click="onDelete" :disabled="delStatus"
             >删除
             </el-button>
-          </template>
+          </template>-->
         </TableConfig>
       </template>
       <template #default>
@@ -41,53 +42,34 @@
             :height="tableConfig.height"
             @selection-change="handleSelectionChange"
         >
-          <el-table-column type="selection" width="45" />
-          <el-table-column align="center" label="序号" width="80">
+<!--          <el-table-column type="selection" width="45" />-->
+<!--          <el-table-column align="center" label="Id" width="120">
             <template v-slot="scope">
-              {{ scope.$index + 1 }}
+              {{ scope.row.id }}
             </template>
-          </el-table-column>
-          <el-table-column align="center" label="昵称" prop="nickName" />
-          <el-table-column align="center" label="创建者" prop="creator" />
-          <el-table-column align="center" label="部门" prop="departmentName" />
-          <el-table-column align="center" label="性别" prop="gender">
+          </el-table-column>-->
+          <el-table-column align="center"
+          v-for="t in tableProps"
+                           :key="t.prop"
+                           :label="t.title"
+                           :prop="t.prop"
+          >
             <template v-slot="scope">
-              <div class="gender-container flex justify-center align-center">
-                <img
-                    class="gender-icon"
-                    :src="
-                    scope.row.gender === 0
-                      ? require('@/assets/icon_sex_man.png')
-                      : require('@/assets/icon_sex_woman.png')
-                  "
-                />
-                <span>{{ scope.row.gender === 0 ? "男" : "女" }}</span>
-              </div>
+             <div>
+               {{scope.row[t.prop]===null?'-':scope.row[t.prop]}}
+             </div>
             </template>
           </el-table-column>
           <el-table-column align="center" label="状态">
             <template v-slot="scope">
-              <el-switch
-                  v-model="scope.row.status"
-                  :active-value="1"
-                  :inactive-value="0"
-              />
+              <el-tag
+                  :type="standardReferStatus(scope.row.status).color"
+              >
+                {{standardReferStatus(scope.row.status).text}}
+              </el-tag>
             </template>
           </el-table-column>
-          <el-table-column align="center" label="邮箱" prop="email" />
-          <el-table-column
-              align="center"
-              label="上次登录时间"
-              prop="createDate"
-              width="160px"
-          />
-          <el-table-column
-              align="center"
-              label="上次登录IP"
-              prop="lastLoginIp"
-              width="130px"
-          />
-          <el-table-column
+<!--          <el-table-column
               align="center"
               label="操作"
               fixed="right"
@@ -120,33 +102,35 @@
               >{{ scope.row.status === 1 ? "禁用" : "启用" }}</el-button
               >
             </template>
-          </el-table-column>
+          </el-table-column>-->
         </el-table>
       </template>
-      <template #footer>
+<!--      <template #footer>
         <TableFooter
             ref="tableFooter"
             @refresh="doRefresh"
             @pageChanged="doRefresh"
         />
-      </template>
+      </template>-->
     </TableBody>
     <popup-update title="修改管理员信息" ref="updateRef" :form-item="updateForms"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {getDefaultList, getTableList, getUserList} from "@/api/url";
+import {getGameList, getMerchantAdminList} from "@/api/url";
 import { useDataTable, useLikeSearch, usePost } from "@/hooks";
 import {nextTick, onBeforeMount, onMounted, reactive, ref} from "vue";
 import { ElMessageBox } from "element-plus";
 import type { TableFooter } from "@/components/types";
 import {useMulSelector} from "@/hooks/table/useMulSelector";
-import {use_Control} from "@/views/m_administrator/use_Control";
+import {use_Control} from "@/hooks/custom/useControl";
 import PopupUpdate from "@/components/dialog/popupUpdate.vue";
+import useTableProps from "@/hooks/custom/useTableProps";
+import {standardReferStatus, standardSelect, tablePropsRedundant} from "@/constant";
 const updateRef=ref<InstanceType<typeof PopupUpdate>|null>(null)
 const tableFooter = ref<TableFooter>();
-const { likeSearchModel, getSearchParams, resetSearch } = useLikeSearch();
+const { likeSearchModel, getSearchParams} = useLikeSearch();
 const {
   handleSuccess,
   dataList,
@@ -159,60 +143,64 @@ const post = usePost();
 likeSearchModel.extraParams = () => ({
   ...tableFooter.value?.withPageInfoData(),
 });
-const selectOptions=[
-      {
-        label: "男",
-        value: 0,
-      },
-      {
-        label: "女",
-        value: 1,
-      },
-    ]
 likeSearchModel.conditionItems = reactive([
   {
-    name: "s1",
-    value: "",
-    type: "select",
-    selectOptions,
-    span: 8,
-  },
-  {
-    name: "s2",
-    label: "账号",
+    name: "gameName",
+    label: "游戏名称",
     value: "",
     type: "input",
-    placeholder: "请输入用户姓名",
+    placeholder: "请输入游戏名称",
     span: 8,
   },
   {
+    name: "status",
+    value: 1,
+    label: "状态",
+    type: "select",
+    clearable:false,
+    selectOptions:standardSelect(),
+    span: 8,
+  },
+/*  {
     name: "s3",
     label: "创建人",
     value: "",
     type: "input",
     placeholder: "请输入用户姓名",
     span: 8,
-  },
+  },*/
 ]);
 // search params
 const doSearch = () => {
-  const params = getSearchParams();
-  console.log(params)
-  ElMessageBox.alert(`模拟模糊搜索成功，搜索参数为：${JSON.stringify(params)}`);
+  // const params = getSearchParams();
+  // console.log(params)
+  tableLoading.value=true
+  doRefresh()
 };
-// table data
+const resetSearch = () => {
+  likeSearchModel.conditionItems && likeSearchModel.conditionItems.forEach((it:any)=>{
+    it.value=''
+    if (it.name==='status') it.value=1
+  })
+}
+// table props
+const {tableProps}=useTableProps([
+    {prop: "gameId", title: "游戏ID"},
+    {prop: "gameName", title: "游戏名称"},
+    ]
+)
+// table refresh
 function doRefresh() {
   post({
-    url: getDefaultList,
+    url: getGameList,
     data: {
-      ...tableFooter.value?.withPageInfoData(),
+      // ...tableFooter.value?.withPageInfoData(),
       ...getSearchParams(),
     },
   })
       .then((r:any)=>{
-        console.table(r.data)
-        handleSuccess(r)
-        tableFooter.value?.setTotalSize(r.totalSize);
+        handleSuccess({data:r.resultSet})
+        // tableFooter.value?.setTotalSize(r.resultSet.length);
       })
       .catch(console.log);
 }
@@ -259,7 +247,7 @@ const updateForms=[
     type: "select",
     name: "roleName",
     value: "",
-    selectOptions,
+    selectOptions:standardSelect(),
   },
 ] as FormItem[]
 // control event

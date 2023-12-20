@@ -126,6 +126,7 @@ import {
   watch,
 } from "vue";
 import { useLayoutStore } from "@/layouts/hooks";
+import useListStore from "@/store/modules/list";
 export default defineComponent({
   name: "Home",
   components: {
@@ -139,6 +140,7 @@ export default defineComponent({
   },
   setup() {
     const layoutStore = useLayoutStore();
+    const listStore=useListStore()
     const mOrderChart = ref<InstanceType<typeof OrderChart>>();
     const salesChart = ref<InstanceType<typeof SalesChart>>();
     const departmentChart = ref<InstanceType<typeof DepartmentChart>>();
@@ -162,6 +164,9 @@ export default defineComponent({
     watch(collapse, (newVal: boolean) => {
       onResize();
     });
+    onMounted(()=>{
+      listStore.addGameList()
+    })
     return {
       collapse,
       mOrderChart,

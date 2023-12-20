@@ -8,7 +8,7 @@
     <div class="flex-sub"></div>
     <div>
       <SortableTable
-        v-if="tableColumns && tableColumns.length > 0"
+        v-if="tool"
         class="margin-left"
         :table-props="tableColumns"
         @update="onUpdateTable"
@@ -76,6 +76,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    tool:{
+      type:Boolean,
+      default:false
+    }
   },
   setup(props, { emit }) {
     const borderRef = ref(props.border);

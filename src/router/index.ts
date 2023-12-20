@@ -45,26 +45,6 @@ export const constantRoutes = [
     ],
   },
   {
-    path: "/m_platform",
-    name: "m_platform",
-    component: Layout,
-    hidden: true,
-    /*meta: {
-      title: "Dashboard",
-      icon: "HouseIcon",
-    },*/
-    children: [
-      {
-        path: "/m_platform/addmerchant",
-        name: "addmerchant",
-        component: (): any => import("@/views/m_platform/addmerchant.vue"),
-        meta: {
-          title: "新增商户",
-        },
-      },
-    ],
-  },
-  {
     path: "/",
     redirect: "/index/home",
     hidden: true,
@@ -94,14 +74,14 @@ export const asyncRoutes = [
           cacheable: true,
         },
       },
-      {
+      /*{
         path: "work-place",
         name: "WorkPlace",
         component: (): any => import("@/views/index/work-place.vue"),
         meta: {
           title: "工作台",
         },
-      },
+      },*/
     ],
   },
 ];
