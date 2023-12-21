@@ -32,5 +32,10 @@ export const getCommentList = "/getCommentList";
 // custom
 export const getMerchantAdminList = "/merchantAdmin/merchantAdminList";
 export const getGameList = "/merchantGame/merchantGameList";
+export const getMemberSelectList = "/abutment/merchantMember/getMember";
 export const getGamePlayList = "/merchantGame/merchantGamePlayList";
+
+export const getMemberList='/statement/memberOrderList'
+export const getMemberBreakEvenList='/statement/memberStatisticsList'
+export const getMerchantBreakEvenList='/statement/merchantStatisticsList'
 

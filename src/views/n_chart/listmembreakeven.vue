@@ -9,7 +9,7 @@
           "
             :search-model="likeSearchModel.conditionItems"
             :default-collapsed-state="true"
-            title="商户列表"
+            title="会员盈亏列表"
             @doSearch="doSearch"
             @resetSearch="resetSearch as any"
         />
@@ -19,7 +19,6 @@
             v-model:border="tableConfig.border"
             v-model:stripe="tableConfig.stripe"
             v-model:tableColumns="tableProps"
-            :tool="true"
             @refresh="doRefresh"
         >
 <!--          <template #actions>
@@ -44,11 +43,11 @@
             @selection-change="handleSelectionChange"
         >
 <!--          <el-table-column type="selection" width="45" />-->
-          <el-table-column align="center" label="Id" width="120">
+<!--          <el-table-column align="center" label="Id" width="120">
             <template v-slot="scope">
               {{ scope.row.id }}
             </template>
-          </el-table-column>
+          </el-table-column>-->
           <el-table-column align="center"
           v-for="t in tableProps"
                            :key="t.prop"
@@ -59,24 +58,6 @@
              <div>
                {{scope.row[t.prop]===null?'-':scope.row[t.prop]}}
              </div>
-            </template>
-          </el-table-column>
-          <el-table-column fixed='right' align="center" label="状态" width="80">
-            <template v-slot="scope">
-              <el-tag
-                  :type="standardReferStatus(scope.row.status).color"
-              >
-                {{standardReferStatus(scope.row.status).text}}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column fixed='right' align="center" label="类型" width="80">
-            <template v-slot="scope">
-              <el-tag
-                  :type="standardReferStatus(scope.row.type,['平台','商户'],['info','warning'],-1).color"
-              >
-                {{standardReferStatus(scope.row.type,['平台','商户'],['info','warning'],-1).text}}
-              </el-tag>
             </template>
           </el-table-column>
 <!--          <el-table-column
@@ -128,16 +109,17 @@
 </template>
 
 <script lang="ts" setup>
-import {getMerchantAdminList} from "@/api/url";
+import {getMemberBreakEvenList} from "@/api/url";
 import { useDataTable, useLikeSearch, usePost } from "@/hooks";
 import {nextTick, onBeforeMount, onMounted, reactive, ref} from "vue";
-import { ElMessageBox } from "element-plus";
 import type { TableFooter } from "@/components/types";
 import {useMulSelector} from "@/hooks/table/useMulSelector";
 import {use_Control} from "@/hooks/custom/useControl";
 import PopupUpdate from "@/components/dialog/popupUpdate.vue";
 import useTableProps from "@/hooks/custom/useTableProps";
-import {standardReferStatus, standardSelect, tablePropsRedundant} from "@/constant";
+import {standardSelect} from "@/constant";
+import useListStore from "@/store/modules/list";
+import {storeToRefs} from "pinia";
 const updateRef=ref<InstanceType<typeof PopupUpdate>|null>(null)
 const tableFooter = ref<TableFooter>();
 const { likeSearchModel, getSearchParams} = useLikeSearch();
@@ -150,35 +132,32 @@ const {
   offTableCollapseTransition,
 } = useDataTable();
 const post = usePost();
+const list=useListStore()
+const {memberList}=storeToRefs(list)
 likeSearchModel.extraParams = () => ({
   ...tableFooter.value?.withPageInfoData(),
 });
 likeSearchModel.conditionItems = reactive([
   {
-    name: "userName",
-    label: "用户名称",
-    value: "",
-    type: "input",
-    placeholder: "请输入用户姓名",
+    name: "memberId",
+    value: '',
+    label: "会员id",
+    type: "select",
+    selectOptions:memberList.value,
+    selectConfig:{
+      labelField:'userName',
+      valueField:'memberId'
+    },
     span: 8,
   },
   {
-    name: "status",
-    value: 1,
-    label: "状态",
-    type: "select",
-    clearable:false,
-    selectOptions:standardSelect(),
+    name: "date",
+    label: "时间",
+    value: "",
+    type: "date-range",
+    placeholder: "请选择时间范围",
     span: 8,
   },
-/*  {
-    name: "s3",
-    label: "创建人",
-    value: "",
-    type: "input",
-    placeholder: "请输入用户姓名",
-    span: 8,
-  },*/
 ]);
 // search params
 const doSearch = () => {
@@ -196,21 +175,19 @@ const resetSearch = () => {
 }
 // table props
 const {tableProps}=useTableProps([
-    {prop: "merchantId", title: "商户ID"},
-    {prop: "merchantName", title: "商户名字"},
-    {prop: "realName", title: "真实姓名"},
-    {prop: "telPhone", title: "联系电话"},
-    {prop: "userName", title: "用户名"},
-    ...tablePropsRedundant
+    {prop: "awardAmount", title: "中奖金额"},
+    {prop: "betAmount", title: "投注金额"},
+  {prop: "profitAmount", title: "盈亏金额"},
+    {prop: "day", title: "统计日期"},
     ]
 )
 // table refresh
 function doRefresh() {
   post({
-    url: getMerchantAdminList,
+    url: getMemberBreakEvenList,
     data: {
       ...tableFooter.value?.withPageInfoData(),
-      ...getSearchParams(),
+      ...{...getSearchParams(),startTime:getSearchParams().date[0],endTime:getSearchParams().date[1]},
     },
   })
       .then((r:any)=>{

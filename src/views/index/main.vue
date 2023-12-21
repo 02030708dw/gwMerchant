@@ -166,6 +166,7 @@ export default defineComponent({
     });
     onMounted(()=>{
       listStore.addGameList()
+      listStore.addMemberList({status:undefined})
     })
     return {
       collapse,

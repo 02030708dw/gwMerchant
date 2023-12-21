@@ -9,7 +9,7 @@
           "
             :search-model="likeSearchModel.conditionItems"
             :default-collapsed-state="true"
-            title="游戏玩法列表"
+            title="商户盈亏列表"
             @doSearch="doSearch"
             @resetSearch="resetSearch as any"
         />
@@ -56,17 +56,8 @@
           >
             <template v-slot="scope">
               <div>
-                {{scope.row[t.prop]===null?'-':scope.row[t.prop]}}
+                {{ scope.row[t.prop] === null ? '-' : scope.row[t.prop] }}
               </div>
-            </template>
-          </el-table-column>
-          <el-table-column align="center" label="状态">
-            <template v-slot="scope">
-              <el-tag
-                  :type="standardReferStatus(scope.row.status).color"
-              >
-                {{standardReferStatus(scope.row.status).text}}
-              </el-tag>
             </template>
           </el-table-column>
           <!--          <el-table-column
@@ -105,36 +96,33 @@
                     </el-table-column>-->
         </el-table>
       </template>
-      <!--      <template #footer>
-              <TableFooter
-                  ref="tableFooter"
-                  @refresh="doRefresh"
-                  @pageChanged="doRefresh"
-              />
-            </template>-->
+      <template #footer>
+        <TableFooter
+            ref="tableFooter"
+            @refresh="doRefresh"
+            @pageChanged="doRefresh"
+        />
+      </template>
     </TableBody>
     <popup-update title="修改管理员信息" ref="updateRef" :form-item="updateForms"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {getGameList, getGamePlayList, getMerchantAdminList} from "@/api/url";
-import { useDataTable, useLikeSearch, usePost } from "@/hooks";
-import {computed, nextTick, onBeforeMount, onMounted, reactive, ref} from "vue";
-import {ElMessage, ElMessageBox} from "element-plus";
-import type { TableFooter } from "@/components/types";
+import {getMemberBreakEvenList, getMerchantBreakEvenList} from "@/api/url";
+import {useDataTable, useLikeSearch, usePost} from "@/hooks";
+import {nextTick, onBeforeMount, onMounted, reactive, ref} from "vue";
+import type {TableFooter} from "@/components/types";
 import {useMulSelector} from "@/hooks/table/useMulSelector";
 import {use_Control} from "@/hooks/custom/useControl";
 import PopupUpdate from "@/components/dialog/popupUpdate.vue";
 import useTableProps from "@/hooks/custom/useTableProps";
-import {standardReferStatus, standardSelect, tablePropsRedundant} from "@/constant";
+import {standardSelect} from "@/constant";
 import useListStore from "@/store/modules/list";
-import {storeToRefs} from "pinia";
-const updateRef=ref<InstanceType<typeof PopupUpdate>|null>(null)
+
+const updateRef = ref<InstanceType<typeof PopupUpdate> | null>(null)
 const tableFooter = ref<TableFooter>();
-const list=useListStore()
-const {gameList}=storeToRefs(list)
-const { likeSearchModel, getSearchParams} = useLikeSearch();
+const {likeSearchModel, getSearchParams} = useLikeSearch();
 const {
   handleSuccess,
   dataList,
@@ -144,88 +132,76 @@ const {
   offTableCollapseTransition,
 } = useDataTable();
 const post = usePost();
-onBeforeMount(()=>{
-  list.addGameList()
-})
+const list = useListStore()
 likeSearchModel.extraParams = () => ({
   ...tableFooter.value?.withPageInfoData(),
 });
 likeSearchModel.conditionItems = reactive([
-  {
-    name: "gameId",
-    label: "游戏Id",
-    value: gameList.value[0]!.gameId,
-    type: "select",
-    placeholder: "请选择游戏Id",
-    span: 8,
-    selectOptions: gameList.value,
-    selectConfig:{
-      labelField:'gameName',
-      valueField:'gameId'
-    }
-  },
-  {
-    name: "status",
-    value: 1,
-    label: "状态",
-    type: "select",
-    clearable:false,
-    selectOptions:standardSelect(),
-    span: 8,
-  },
   /*  {
-      name: "s3",
-      label: "创建人",
-      value: "",
-      type: "input",
-      placeholder: "请输入用户姓名",
+      name: "memberId",
+      value: '',
+      label: "会员id",
+      type: "select",
+      selectOptions:[],
+      selectConfig:{
+        labelField:'gameName',
+        valueField:'gameId'
+      },
       span: 8,
     },*/
+  {
+    name: "date",
+    label: "时间",
+    value: "",
+    type: "date-range",
+    placeholder: "请选择时间范围",
+    span: 16,
+  },
 ]);
 // search params
 const doSearch = () => {
   // const params = getSearchParams();
   // console.log(params)
-  tableLoading.value=true
+  tableLoading.value = true
+  tableFooter.value?.resetCurrentPage()
   doRefresh()
 };
 const resetSearch = () => {
-  likeSearchModel.conditionItems && likeSearchModel.conditionItems.forEach((it:any)=>{
-    it.value=''
-    if (it.name==='status') it.value=1
+  likeSearchModel.conditionItems && likeSearchModel.conditionItems.forEach((it: any) => {
+    it.value = ''
+    if (it.name === 'status') it.value = 1
   })
 }
 // table props
-const {tableProps}=useTableProps([
-      {prop: "gameId", title: "游戏ID"},
-      {prop: "gameName", title: "游戏名称"},
-      {prop: "gamePlayId", title: "游戏玩法ID"},
-      {prop: "gamePlayName", title: "游戏玩法名称"},
-      {prop: "gamePlayTypeId", title: "游戏玩法类型ID"},
-      {prop: "gamePlayTypeName", title: "游戏类型名称"},
+const {tableProps} = useTableProps([
+  {prop: "awardNum", title: "开奖号码"},
+      {prop: "awardAmount", title: "中奖金额"},
+      {prop: "betAmount", title: "投注金额"},
+      {prop: "profitAmount", title: "盈亏金额"},
+      {prop: "day", title: "统计日期"},
     ]
 )
+
 // table refresh
 function doRefresh() {
   post({
-    url: getGamePlayList,
+    url: getMerchantBreakEvenList,
     data: {
-      // ...tableFooter.value?.withPageInfoData(),
-      ...getSearchParams(),
+      ...tableFooter.value?.withPageInfoData(),
+      ...{...getSearchParams(), startTime: getSearchParams().date[0], endTime: getSearchParams().date[1]},
     },
   })
-      .then((r:any)=>{
-        handleSuccess({data:r.resultSet})
-        // tableFooter.value?.setTotalSize(r.resultSet.length);
+      .then((r: any) => {
+        handleSuccess({data: r.resultSet.data})
+        tableFooter.value?.setTotalSize(r.resultSet.total);
       })
-      .catch((rr)=>{
-        ElMessage.error(rr.message)
-      });
+      .catch(console.log);
 }
+
 // multiple checkbox onChange Event
-const {delStatus,del,handleSelectionChange}=useMulSelector <typeof dataList>('111',doRefresh)
+const {delStatus, del, handleSelectionChange} = useMulSelector<typeof dataList>('111', doRefresh)
 // update form
-const updateForms=[
+const updateForms = [
   {
     label: "账号：",
     type: "input",
@@ -233,7 +209,7 @@ const updateForms=[
     value: "",
     maxLength: 50,
     inputType: "text",
-    disabled:true
+    disabled: true
   },
   {
     label: "管理员名称：",
@@ -265,11 +241,11 @@ const updateForms=[
     type: "select",
     name: "roleName",
     value: "",
-    selectOptions:standardSelect(),
+    selectOptions: standardSelect(),
   },
 ] as FormItem[]
 // control event
-const {onCheck,onUpdateItem,onLog,onResetPass,onEnableItem}=use_Control<FormItem>(updateRef,updateForms)
+const {onCheck, onUpdateItem, onLog, onResetPass, onEnableItem} = use_Control<FormItem>(updateRef, updateForms)
 const onDelete = () => {
   del('id')
 }
@@ -281,5 +257,35 @@ onBeforeMount(offTableCollapseTransition);
 </script>
 
 <style lang="scss" scoped>
+.avatar-container {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto;
+  vertical-align: middle;
 
+  .avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
+
+  .avatar-vip {
+    border: 2px solid #cece1e;
+  }
+
+  .vip {
+    position: absolute;
+    top: 0;
+    right: -9px;
+    width: 15px;
+    transform: rotate(60deg);
+  }
+}
+
+.gender-container {
+  .gender-icon {
+    width: 20px;
+  }
+}
 </style>

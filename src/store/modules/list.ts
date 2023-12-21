@@ -1,10 +1,12 @@
 import {defineStore} from "pinia";
-import {post} from "@/api/http";
-import {getGameList} from "@/api/url";
+import {get, post} from "@/api/http";
+import {getGameList, getMemberSelectList} from "@/api/url";
 const useListStore = defineStore("list", {
+    persist:true,
     state: () => {
         return {
-            gameList:[]
+            gameList:[] as Record<'gameName'|'gameId', string>[],
+            memberList:[]
         };
     },
     getters: {
@@ -17,6 +19,13 @@ const useListStore = defineStore("list", {
                data
            })
             this.gameList=r.resultSet
+        },
+        async addMemberList(data:any={status:1}){
+            const r=await get({
+                url:getMemberSelectList,
+                data
+            })
+            this.memberList=r.resultSet
         }
     },
 });

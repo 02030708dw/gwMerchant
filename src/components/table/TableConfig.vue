@@ -13,14 +13,14 @@
         :table-props="tableColumns"
         @update="onUpdateTable"
       />
-      <span class="margin-left-sm" />
-      <el-tooltip effect="dark" content="刷新页面" placement="top">
+      <span class="margin-left-sm" v-if="toolBtn[0]" />
+      <el-tooltip effect="dark" v-if="toolBtn[0]" content="刷新页面" placement="top">
         <el-icon class="icon-wrapper" @click="doRefresh">
           <RefreshIcon />
         </el-icon>
       </el-tooltip>
-      <span class="margin-left-sm" />
-      <el-tooltip effect="dark" content="全屏" placement="top">
+      <span class="margin-left-sm" v-if="toolBtn[1]" />
+      <el-tooltip effect="dark" v-if="toolBtn[1]" content="全屏" placement="top">
         <el-icon class="icon-wrapper" @click="onFullScreen">
           <FullScreenIcon />
         </el-icon>
@@ -79,7 +79,11 @@ export default defineComponent({
     tool:{
       type:Boolean,
       default:false
-    }
+    },
+    toolBtn:{
+      type:Array as PropType<number[]>,
+      default:()=>[false,false]
+    },
   },
   setup(props, { emit }) {
     const borderRef = ref(props.border);

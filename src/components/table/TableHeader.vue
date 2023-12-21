@@ -102,7 +102,7 @@
                 v-else-if="item.type === 'date-range'"
                 class="flex search-item-wrapper"
               >
-                <span>{{ item.label }}</span>
+                <span style="width: 50px">{{ item.label }}</span>
                 <el-date-picker
                   v-model="item.value"
                   type="daterange"

@@ -9,7 +9,7 @@
           "
             :search-model="likeSearchModel.conditionItems"
             :default-collapsed-state="true"
-            title="商户列表"
+            title="会员订单列表"
             @doSearch="doSearch"
             @resetSearch="resetSearch as any"
         />
@@ -64,18 +64,24 @@
           <el-table-column fixed='right' align="center" label="状态" width="80">
             <template v-slot="scope">
               <el-tag
-                  :type="standardReferStatus(scope.row.status).color"
+                  :type="standardReferStatus(scope.row.status,
+                  ['待开奖','中奖','未中奖','用户撤单','后台撤单'],
+                  ['info','success','info','info','info']).color"
               >
-                {{standardReferStatus(scope.row.status).text}}
+                {{standardReferStatus(scope.row.status,
+                  ['待开奖','中奖','未中奖','用户撤单','后台撤单'],
+                  ['info','success','info','info','info']
+              ).text}}
               </el-tag>
             </template>
           </el-table-column>
           <el-table-column fixed='right' align="center" label="类型" width="80">
             <template v-slot="scope">
               <el-tag
-                  :type="standardReferStatus(scope.row.type,['平台','商户'],['info','warning'],-1).color"
+                  :type="standardReferStatus(scope.row.type,
+                  ['彩票','体育直播竞猜','彩票直播竞猜'],['info','warning','default'],-1).color"
               >
-                {{standardReferStatus(scope.row.type,['平台','商户'],['info','warning'],-1).text}}
+                {{standardReferStatus(scope.row.type,['彩票','体育直播竞猜','彩票直播竞猜'],['info','warning','default'],-1).text}}
               </el-tag>
             </template>
           </el-table-column>
@@ -128,7 +134,7 @@
 </template>
 
 <script lang="ts" setup>
-import {getMerchantAdminList} from "@/api/url";
+import {getMemberList, getMerchantAdminList} from "@/api/url";
 import { useDataTable, useLikeSearch, usePost } from "@/hooks";
 import {nextTick, onBeforeMount, onMounted, reactive, ref} from "vue";
 import { ElMessageBox } from "element-plus";
@@ -138,6 +144,7 @@ import {use_Control} from "@/hooks/custom/useControl";
 import PopupUpdate from "@/components/dialog/popupUpdate.vue";
 import useTableProps from "@/hooks/custom/useTableProps";
 import {standardReferStatus, standardSelect, tablePropsRedundant} from "@/constant";
+import useListStore from "@/store/modules/list";
 const updateRef=ref<InstanceType<typeof PopupUpdate>|null>(null)
 const tableFooter = ref<TableFooter>();
 const { likeSearchModel, getSearchParams} = useLikeSearch();
@@ -150,25 +157,30 @@ const {
   offTableCollapseTransition,
 } = useDataTable();
 const post = usePost();
+const list=useListStore()
 likeSearchModel.extraParams = () => ({
   ...tableFooter.value?.withPageInfoData(),
 });
 likeSearchModel.conditionItems = reactive([
   {
-    name: "userName",
-    label: "用户名称",
+    name: "orderNum",
+    label: "订单号",
     value: "",
     type: "input",
-    placeholder: "请输入用户姓名",
+    placeholder: "请输入订单号",
     span: 8,
   },
   {
-    name: "status",
-    value: 1,
-    label: "状态",
+    name: "gameId",
+    value: '',
+    label: "游戏ID",
     type: "select",
     clearable:false,
-    selectOptions:standardSelect(),
+    selectOptions:list.gameList,
+    selectConfig:{
+      labelField:'gameName',
+      valueField:'gameId'
+    },
     span: 8,
   },
 /*  {
@@ -197,17 +209,20 @@ const resetSearch = () => {
 // table props
 const {tableProps}=useTableProps([
     {prop: "merchantId", title: "商户ID"},
-    {prop: "merchantName", title: "商户名字"},
-    {prop: "realName", title: "真实姓名"},
-    {prop: "telPhone", title: "联系电话"},
-    {prop: "userName", title: "用户名"},
-    ...tablePropsRedundant
+    {prop: "gameId", title: "游戏ID"},
+    {prop: "gameName", title: "游戏名称"},
+    {prop: "memberId", title: "会员ID"},
+    {prop: "memberName", title: "会员名称"},
+    {prop: "orderNo", title: "订单号"},
+    {prop: "winAmount", title: "中奖金额"},
+    {prop: "betAmount", title: "投注金额"},
+    {prop: "createdAt", title: "创建时间"},
     ]
 )
 // table refresh
 function doRefresh() {
   post({
-    url: getMerchantAdminList,
+    url: getMemberList,
     data: {
       ...tableFooter.value?.withPageInfoData(),
       ...getSearchParams(),

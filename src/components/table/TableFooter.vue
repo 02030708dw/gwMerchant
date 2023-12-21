@@ -98,6 +98,9 @@ export default defineComponent({
     const onRefresh = () => {
       emit("refresh");
     };
+    const resetCurrentPage=()=>{
+      pageModel.currentPage=1
+    }
     return {
       pageModel,
       placement,
@@ -107,6 +110,7 @@ export default defineComponent({
       setTotalSize,
       setPageSize,
       onRefresh,
+      resetCurrentPage,
       RefreshIcon,
     };
   },
